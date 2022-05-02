@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/index.css">
+    <title>Inicio</title>
+</head>
+
+<body>
+    <main>
+        <div class="container">
+            <% for (pokemon of pokemons){%>
+                <div class="card-pokemon">
+                    <img class="img-pokemon" src="/images/pokemons/<%=pokemon.image%>" alt="">
+                    <div class="info-N-S">
+                        <h2 class="text-name">
+                            <%=pokemon.title%>
+                        </h2>
+                        <h3 class="card-Stock">
+                            <%=pokemon.stock%>
+                        </h3>
+                        <p class="desc">
+                            <%=pokemon.descripcion%>
+                        </p>
+                    </div>
+                    <ul class="list">
+                        <li class="list-item">
+                            <p class="price">
+                                <%=pokemon.price%>:
+                            </p>
+                        </li>
+                    </ul>
+                    <div class="div-button">
+                        <button class="buy-pokemon"> <a href="/<%=pokemon.id%>"><i></i>Ver mas</a></button>
+                    </div>
+                </div>
+                <% } %>
+        </div>
+        <div class="box-button">
+            <button class="buy-pokemon2"> <a href="newProduct"><i></i>Agregar nuevo Pokemon</a></button>
+        </div>
+    </main>
+</body>
+
+</html>

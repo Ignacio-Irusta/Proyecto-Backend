@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/productID.css">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <main>
+        <div class="card-Desc-Total">
+            <div class="img-prodID">
+                <img class="imageID" src="/images/pokemons/<%=pokemonID.image%>" width="300">
+            </div>
+            <div class="info-idPokemon">
+                <h2 class="info-id">Nombre: <%=pokemonID.title%>
+                </h2>
+                <h3 class="info-id">Stock: <%=pokemonID.stock%>
+                </h3>
+                <p class="info-id">Descripcion: <%=pokemonID.descripcion%>
+                </p>
+                <p class="info-id">Precio: <%=pokemonID.price%>
+                </p>
+                <div class="box-button">
+                    <button class="button-green">Comprar</button>
+                    <button class="button-violet"> <a href="/<%=pokemonID.id%>/edit"><i></i>Actualizar</a></button>
+                    <form class="forms" action="/<%=pokemonID.id%>/edit?_method=DELETE" method="POST"
+                        enctype=multipart/form-data>
+                        <button type="submit" class="button-red">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

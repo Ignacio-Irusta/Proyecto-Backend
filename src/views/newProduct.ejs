@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/newProduct.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <main>
+        <form class="form-pokemon" action="/newProduct" method="POST">
+            <h1 class="tittle">Ingrese su nuevo Pokemon</h1>
+            <input type="text" name="title" placeholder="Nombre" required>
+            <input type="number" name="price" placeholder="Precio" required>
+            <input type="text" name="descripcion" placeholder="Descripcion" required maxlength="30">
+            <input type="number" name="stock" placeholder="Stock" required>
+            <input type="url" name="image" id="" placeholder="Ingrese su url">
+            <button class="button-create-poke" type="submit">Agregar</button>
+        </form>
+    </main>
+</body>
+
+</html>

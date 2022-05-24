@@ -5,6 +5,9 @@ const methodOverride = require("method-override");
 const { Server: HttpServer } = require("http");
 const { Server: IOServer } = require("socket.io");
 const app = express();
+require('./config');
+const Pokes = require("./daoPokemons");
+const Carris = require("./daoCarrito");
 
 //express
 app.use(express.json());
@@ -53,7 +56,6 @@ connectedServer.on("error", (error) =>
     }
   }
 }*/
-//cambiar input de url a imagen
 //---------------------------------------------------------------------------------
 // "Login" falso para admins
 
@@ -136,6 +138,9 @@ app.post("/:id/carrito", async (req, res) => {
   try {
     fs.promises.writeFile("carrito.js", JSON.stringify(pokemonsDos, null, "\t"));
     console.log("Guardado");
+    const {title: title, stock: stock, price: price} = req.body;
+    const Carri = new Carris({id: id,title: title, stock: stock, price: price})
+    await Carri.save()
   } catch (err) {
     console.log("error al guardar");
   }
@@ -170,6 +175,9 @@ app.post("/newProduct", soloParaAdmins, async (req, res) => {
   });
   try {
     fs.promises.writeFile("productos.js", JSON.stringify(pokemons, null, "\t"));
+    const {id: id, title, stock: stock, price: price} = req.body;
+    const Poke = new Pokes({id: id,title: title, stock: stock, price: price})
+    await Poke.save()
     console.log("Guardado");
   } catch (err) {
     console.log("error al guardar");
@@ -201,6 +209,8 @@ app.put("/:id", soloParaAdmins, async (req, res) => {
       JSON.stringify(editPokemon, null, "\t")
     );
     console.log("Guardado");
+    const {id: id, title, stock: stock, price: price} = req.body;
+    await Pokes.findByIdAndUpdate(id, {id: id, title: title, stock: stock, price: price})
   } catch (err) {
     console.log("error al guardar");
   }
@@ -219,6 +229,7 @@ app.delete("/:id/edit", soloParaAdmins, async (req, res) => {
   try {
     fs.promises.writeFile("productos.js", JSON.stringify(filter, null, "\t"));
     console.log("Guardado");
+    await Pokes.findByIdAndDelete(id)
   } catch (err) {
     console.log("error al guardar");
   }
@@ -237,6 +248,7 @@ app.delete("/:id/carrito", soloParaAdmins, async (req, res) => {
   try {
     fs.promises.writeFile("carrito.js", JSON.stringify(filter, null, "\t"));
     console.log("Guardado");
+    await Carris.findByIdAndDelete(id)
   } catch (err) {
     console.log("error al guardar");
   }

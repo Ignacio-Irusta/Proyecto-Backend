@@ -1,4 +1,5 @@
-const {Schema, model} = require('mongoose')
+const mongoose = require('mongoose')
+const {Schema} = require('mongoose')
 
 const noteSchema = new Schema ({
     id: { type: String, required: true },
@@ -7,4 +8,4 @@ const noteSchema = new Schema ({
     price: { type: Number, required: true },
 },{timestamps: true})
 
-module.exports = model('pokemons', noteSchema);
+module.exports = mongoose.model('pokemons', noteSchema);

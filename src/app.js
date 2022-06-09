@@ -4,15 +4,37 @@ const path = require("path");
 const methodOverride = require("method-override");
 const { Server: HttpServer } = require("http");
 const { Server: IOServer } = require("socket.io");
-const app = express();
-require('./config');
+const engine = require("ejs-mate");
+const session = require('express-session');
+const passport = require("passport");
+const morgan = require('morgan')
 const Pokes = require("./daoPokemons");
 const Carris = require("./daoCarrito");
 
+const app = express();
+require('./config');
+require('./passport/local-auth');
+const flash = require('connect-flash');
+
 //express
+app.use(morgan('dev'));
+app.use(session({
+  secret: 'coderhouse-session',
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
+app.use((req, res, next) => {
+  app.locals.signupMessage = req.flash('signupMessage');
+  app.locals.signinMessage = req.flash('signinMessage');
+  app.locals.user = req.user;
+  next();
+});
 
 //server
 const httpServer = new HttpServer(app);
@@ -20,10 +42,11 @@ const io = new IOServer(httpServer);
 
 // view engine setup (Para renderizar ejs)
 app.set("views", path.join(__dirname, "views"));
+app.engine('ejs', engine);
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
-//Server
 
+//Server
 const PORT = 8080;
 const connectedServer = httpServer.listen(PORT, () => {
   console.log(
@@ -57,41 +80,70 @@ connectedServer.on("error", (error) =>
   }
 }*/
 //---------------------------------------------------------------------------------
-// "Login" falso para admins
+// Pagina de inicio
 
-
-const esAdmin = true;
-//LO PONGO EN TRUE PARA QUE VAYA A TODOS LADOS.
-
-function soloParaAdmins(req, res, next) {
-  if (esAdmin) {
-    next();
-  } else {
-    return res.sendStatus(403);
-  }
-}
-//---------------------------------------------------------------------------------
-// render pagina de inicio
-app.get("/", async (req, res) => {
+app.get("/", isAuthenticated, async (req, res) => {
   const datos = await fs.promises.readFile("productos.js", "utf-8");
   const arrayPokemon = JSON.parse(datos);
   const pokemons = arrayPokemon;
   res.render("index", { pokemons });
 });
+
+//---------------------------------------------------------------------------------
+//SignIn y SignUp
+
+app.get("/signin", (req, res, next) => {
+  res.render("signin");
+});
+
+app.post("/signin", passport.authenticate('local-signin' ,{
+  successRedirect: '/',
+  failureRedirect: '/signin',
+  passReqToCallback: true
+}));
+
+app.get("/signup", (req, res, next) => {
+  res.render("signup");
+});
+
+app.post("/signup", passport.authenticate('local-signup' ,{
+  successRedirect: '/signin',
+  failureRedirect: '/signup',
+  passReqToCallback: true
+}));
+
+app.get('/logout', (req, res) => {
+  req.logout(function(err) {
+    if (err) { 
+      return next(err); 
+    }
+    res.redirect("/signin");
+  });
+});
+
+function isAuthenticated(req, res, next) {
+  if(req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/signin')
+};
+
 //---------------------------------------------------------------------------------
 //render pagina agregar nuevo pokemon
-app.get("/newProduct", soloParaAdmins, (req, res) => {
+
+app.get("/newProduct", (req, res) => {
   res.render("newProduct");
 });
 
 //---------------------------------------------------------------------------------
 //render pagina agregar nuevo pokemon
-app.get("/:id/carrito", soloParaAdmins, async (req, res) => {
+app.get("/:id/carrito", async (req, res) => {
   const datos = await fs.promises.readFile("carrito.js", "utf-8");
   const arrayPokemonCar = JSON.parse(datos);
   
   return res.render("car", { car: arrayPokemonCar });
 });
+
 //---------------------------------------------------------------------------------
 //mostrar pokemon en en especifico
 app.get("/:id", async (req, res) => {
@@ -107,6 +159,7 @@ app.get("/:id", async (req, res) => {
   }
   return res.render("productID", { pokemonID: filter[0] });
 });
+
 //---------------------------------------------------------------------------------
 //render a carrito
 app.post("/:id/carrito", async (req, res) => {
@@ -146,9 +199,10 @@ app.post("/:id/carrito", async (req, res) => {
   }
   return res.render("car", { car: pokemonsDos });
 });
+
 //---------------------------------------------------------------------------------
 //mostrar pokemon en especifico
-app.get("/:id/edit", soloParaAdmins, async (req, res) => {
+app.get("/:id/edit", async (req, res) => {
   const datos = await fs.promises.readFile("productos.js", "utf-8");
   const arrayPokemon = JSON.parse(datos);
   const pokemons = arrayPokemon;
@@ -161,9 +215,10 @@ app.get("/:id/edit", soloParaAdmins, async (req, res) => {
   }
   res.render("updateProduct", { pokemonEdit: filter[0] });
 });
+
 //---------------------------------------------------------------------------------
 //render subir al producto.js el nuevo pokemon
-app.post("/newProduct", soloParaAdmins, async (req, res) => {
+app.post("/newProduct", async (req, res) => {
   const datos = await fs.promises.readFile("productos.js", "utf-8");
   const arrayPokemon = JSON.parse(datos);
   const pokemons = arrayPokemon;
@@ -184,9 +239,10 @@ app.post("/newProduct", soloParaAdmins, async (req, res) => {
   }
   res.render("index", { pokemons });
 });
+
 //---------------------------------------------------------------------------------
 //editar un pokemon en especifico
-app.put("/:id", soloParaAdmins, async (req, res) => {
+app.put("/:id", async (req, res) => {
   const datos = await fs.promises.readFile("productos.js", "utf-8");
   const arrayPokemon = JSON.parse(datos);
   const pokemons = arrayPokemon;
@@ -216,9 +272,10 @@ app.put("/:id", soloParaAdmins, async (req, res) => {
   }
   res.render("index", { pokemons });
 });
+
 //---------------------------------------------------------------------------------
 //borrar un pokemon en especifico
-app.delete("/:id/edit", soloParaAdmins, async (req, res) => {
+app.delete("/:id/edit", async (req, res) => {
   const datos = await fs.promises.readFile("productos.js", "utf-8");
   const arrayPokemon = JSON.parse(datos);
   const pokemons = arrayPokemon;
@@ -237,7 +294,7 @@ app.delete("/:id/edit", soloParaAdmins, async (req, res) => {
 });
 
 //---------------------------------------------------------------------------------
-app.delete("/:id/carrito", soloParaAdmins, async (req, res) => {
+app.delete("/:id/carrito", async (req, res) => {
   const datos = await fs.promises.readFile("carrito.js", "utf-8");
   const arrayPokemon = JSON.parse(datos);
   const carritoUser = arrayPokemon;
@@ -256,7 +313,7 @@ app.delete("/:id/carrito", soloParaAdmins, async (req, res) => {
 });
 
 //---------------------------------------------------------------------------------
-app.delete("/:id/carrito/delet", soloParaAdmins, async (req, res) => {
+app.delete("/:id/carrito/delet", async (req, res) => {
   const pokemon = [];
 
 

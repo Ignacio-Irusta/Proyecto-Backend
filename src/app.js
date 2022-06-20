@@ -16,6 +16,10 @@ require('./config');
 require('./passport/local-auth');
 const flash = require('connect-flash');
 
+//dotenv y process
+require('dotenv').config({path:'./.env'});
+const puerto = process.env.PORT || 8080;
+
 //express
 app.use(morgan('dev'));
 app.use(session({
@@ -36,9 +40,6 @@ app.use((req, res, next) => {
   next();
 });
 
-//server
-const httpServer = new HttpServer(app);
-const io = new IOServer(httpServer);
 
 // view engine setup (Para renderizar ejs)
 app.set("views", path.join(__dirname, "views"));
@@ -47,8 +48,8 @@ app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
 
 //Server
-const PORT = 8080;
-const connectedServer = httpServer.listen(PORT, () => {
+const httpServer = new HttpServer(app);
+const connectedServer = httpServer.listen(puerto, () => {
   console.log(
     `Servidor http escuchando en el puerto ${connectedServer.address().port}`
   );

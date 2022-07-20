@@ -18,6 +18,9 @@ passport.deserializeUser(async (id, done) =>{
 passport.use('local-signup', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
+    nameField: 'name',
+    directionField: 'direction',
+    phoneField: 'phone',
     passReqToCallback: true
 }, async (req, email, password, done) => {
     const users = await User.findOne({'email': email});
@@ -25,8 +28,6 @@ passport.use('local-signup', new LocalStrategy({
         return done(null, false, req.flash('signupMessage', 'El email ya existe.'));
     }else {
         const user = new User(req.body);
-        /*user.email = email;
-        user.password = user.encryptPassword(password);*/
         await user.save();
         done(null, user);
     }
@@ -35,6 +36,10 @@ passport.use('local-signup', new LocalStrategy({
 passport.use('local-signin', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
+    nameField: 'name',
+    directionField: 'direction',
+    phoneField: 'phone',
+    imageField: 'image',
     passReqToCallback: true
 }, async (req, email, password, done) => {
     const user = await User.findOne({'email': email, 'password': password});

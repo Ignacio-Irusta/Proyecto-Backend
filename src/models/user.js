@@ -5,7 +5,11 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema({
     email: String,
-    password: String
+    password: String,
+    name: String,
+    direction: String,
+    phone: String,
+    image: String
 });
 
 userSchema.methods.encryptPassword = (password) =>{

@@ -13,10 +13,18 @@
     <main>
         <form class="form-pokemon" action="/signup" method="post" >
                 <h1 class="tittle">Registro</h1>
+                <label for="name">Nombre: </label>
+                <input type="text" name="name" placeholder="Ingrese su nombre">
                 <label for="username">Email: </label>
                 <input type="email" name="email" placeholder="Ingrese su email">
                 <label for="password">Contraseña: </label>
                 <input type="password" name="password" placeholder="Ingrese su Contraseña">
+                <label for="direction">Direccion: </label>
+                <input type="text" name="direction" placeholder="Ingrese su direcccion">
+                <label for="phone">Telefono: </label>
+                <input type="number" name="phone" placeholder="Ingrese su telefono">
+                <label for="image">Imagen de Perfil: </label>
+                <input type="url" name="image" placeholder="Ingrese su url">
                 <button class="button-create-poke" type="submit">Registrarse</button>
                 <button class="button-create-poke"> <a href="signin">Volver al Login</a></button>
                 <% if (signupMessage) { %>

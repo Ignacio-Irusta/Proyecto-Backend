@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/profile.css">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <main>
+        <div class="card-Desc-Total">
+            <h1 class="tittle profile">Perfil</h1>
+            <div class="img-prodID">
+                <img class="imageID" src="<%=User.image%>" width="300">
+            </div>
+            <div class="info-idPokemon">
+                <h2 class="info-id">Nombre: <%=User.name%> 
+                </h2>
+                <h3 class="info-id">Telefono: <%=User.phone%>
+                </h3>
+                <p class="info-id">Direccion: <%=User.direction%>
+                </p>
+                <div class="box-button">
+                    <button class="button-green"><a href="/"><i></i>Ir al menu de compras</a></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

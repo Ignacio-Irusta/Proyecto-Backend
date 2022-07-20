@@ -1,0 +1,82 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    background-image: url("/images/imageIDprod.jpg");
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+  }
+  
+  .card-Desc-Total {
+    text-align: center;
+    border-radius: 10px;
+    margin: 50px 150px 10px 150px;
+    background-color: rgba(212, 212, 212, 0.274);
+    -webkit-box-shadow: -2px -2px 37px 5px rgba(0, 0, 0, 0.63);
+    box-shadow: -2px -2px 37px 5px rgba(0, 0, 0, 0.63);
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .img-prodID {
+    width: 40%;
+  }
+  
+  .info-idPokemon {
+    width: 40%;
+    text-align: start;
+  }
+  
+  .info-id {
+    margin-top: 15px;
+  }
+  
+  .box-button {
+    margin: 10px 0px 10px 0px;
+  }
+  
+  .button-green {
+    background-color: rgb(81, 187, 59);
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    margin: 0px 5px 0px 0px;
+  }
+  
+  .button-violet {
+    background-color: rgb(174, 65, 201);
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    margin: 0px 5px 5px 0px;
+  }
+  
+  .button-red {
+    background-color: rgb(224, 55, 55);
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    margin: 5px 5px 0px 0px;
+  }
+  
+  a {
+    text-decoration: none;
+    color: white;
+  }
+  
+  .profile {
+    width: 100%
+  }
+  .imageID {
+    width: 100%;
+    border-radius: 10px;
+  }

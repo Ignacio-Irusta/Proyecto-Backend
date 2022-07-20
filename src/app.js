@@ -10,6 +10,7 @@ const passport = require("passport");
 const morgan = require('morgan')
 const Pokes = require("./daoPokemons");
 const Carris = require("./daoCarrito");
+const User = require("./models/user")
 
 const app = express();
 require('./config');
@@ -98,7 +99,8 @@ app.get("/signin", (req, res, next) => {
 });
 
 app.post("/signin", passport.authenticate('local-signin' ,{
-  successRedirect: '/',
+
+  successRedirect: '/profile',
   failureRedirect: '/signin',
   passReqToCallback: true
 }));
@@ -128,6 +130,20 @@ function isAuthenticated(req, res, next) {
   }
   res.redirect('/signin')
 };
+
+//HOME
+
+app.get("/profile", (req, res) => {
+  User.findById(req.user,(err,User)=>{
+    if(err){
+      console.log(err);
+    } else {
+      console.log(User);
+      return res.render("profile", {User});
+    }
+  })
+  
+});
 
 //---------------------------------------------------------------------------------
 //render pagina agregar nuevo pokemon
@@ -180,13 +196,6 @@ app.post("/:id/carrito", async (req, res) => {
       return;
     }
   });
-  /*const pokemonBuyID = carritoUser.find(function (car) {
-    if (car.id === 0) {
-      return car.object.push(pokemonBuy)
-    } else {
-      return;
-    }
-  });*/
   pokemonsDos.push(pokemonBuy)
 
   try {

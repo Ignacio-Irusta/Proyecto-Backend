@@ -11,6 +11,7 @@ const morgan = require('morgan')
 const Pokes = require("./daoPokemons");
 const Carris = require("./daoCarrito");
 const User = require("./models/user")
+const assert = require("assert")
 
 const app = express();
 require('./config');
@@ -58,29 +59,6 @@ const connectedServer = httpServer.listen(puerto, () => {
 connectedServer.on("error", (error) =>
   console.log(`Error en servidor ${error}`)
 );
-
-// FS
-
-/*class Archivo {
-  constructor() {
-    this.productos = [];
-  }
-
-  async guardar(producto) {
-    producto.id = this.productos.length + 1;
-    const data = this.productos;
-    data.push(producto);
-    try {
-      await fs.promises.writeFile(
-        "productos.js",
-        JSON.stringify(data, null, "\t")
-      );
-      return;
-    } catch (err) {
-      console.log("error al guardar");
-    }
-  }
-}*/
 //---------------------------------------------------------------------------------
 // Pagina de inicio
 
@@ -139,10 +117,10 @@ app.get("/profile", (req, res) => {
       console.log(err);
     } else {
       console.log(User);
+      assert.ok(User);
       return res.render("profile", {User});
     }
   })
-  
 });
 
 //---------------------------------------------------------------------------------

@@ -3,7 +3,6 @@ const express = require("express");
 const path = require("path");
 const methodOverride = require("method-override");
 const { Server: HttpServer } = require("http");
-const { Server: IOServer } = require("socket.io");
 const engine = require("ejs-mate");
 const session = require('express-session');
 const passport = require("passport");
@@ -11,12 +10,16 @@ const morgan = require('morgan')
 const Pokes = require("./daoPokemons");
 const Carris = require("./daoCarrito");
 const User = require("./models/user")
-const assert = require("assert")
 
 const app = express();
 require('./config');
 require('./passport/local-auth');
 const flash = require('connect-flash');
+const { error } = require("console");
+
+//global
+
+var user;
 
 //dotenv y process
 require('dotenv').config({path:'./.env'});
@@ -60,6 +63,7 @@ connectedServer.on("error", (error) =>
   console.log(`Error en servidor ${error}`)
 );
 //---------------------------------------------------------------------------------
+
 // Pagina de inicio
 
 app.get("/", isAuthenticated, async (req, res) => {
@@ -111,13 +115,12 @@ function isAuthenticated(req, res, next) {
 
 //HOME
 
-app.get("/profile", (req, res) => {
+app.get("/profile", isAuthenticated, (req, res) => {
   User.findById(req.user,(err,User)=>{
     if(err){
       console.log(err);
     } else {
-      console.log(User);
-      assert.ok(User);
+      user = User;
       return res.render("profile", {User});
     }
   })
@@ -126,13 +129,13 @@ app.get("/profile", (req, res) => {
 //---------------------------------------------------------------------------------
 //render pagina agregar nuevo pokemon
 
-app.get("/newProduct", (req, res) => {
+app.get("/newProduct", isAuthenticated, (req, res) => {
   res.render("newProduct");
 });
 
 //---------------------------------------------------------------------------------
 //render pagina agregar nuevo pokemon
-app.get("/:id/carrito", async (req, res) => {
+app.get("/:id/carrito", isAuthenticated, async (req, res) => {
   const datos = await fs.promises.readFile("carrito.js", "utf-8");
   const arrayPokemonCar = JSON.parse(datos);
   
@@ -141,7 +144,7 @@ app.get("/:id/carrito", async (req, res) => {
 
 //---------------------------------------------------------------------------------
 //mostrar pokemon en en especifico
-app.get("/:id", async (req, res) => {
+app.get("/:id", isAuthenticated, async (req, res) => {
   const datos = await fs.promises.readFile("productos.js", "utf-8");
   const arrayPokemon = JSON.parse(datos);
   const pokemons = arrayPokemon;
@@ -158,7 +161,6 @@ app.get("/:id", async (req, res) => {
 //---------------------------------------------------------------------------------
 //render a carrito
 app.post("/:id/carrito", async (req, res) => {
-  //const carritoUser = [{id:0, object:[]}];
   const datos = await fs.promises.readFile("productos.js", "utf-8");
   const datosDos = await fs.promises.readFile("carrito.js", "utf-8");
   const arrayPokemonDos = JSON.parse(datosDos);
@@ -179,8 +181,8 @@ app.post("/:id/carrito", async (req, res) => {
   try {
     fs.promises.writeFile("carrito.js", JSON.stringify(pokemonsDos, null, "\t"));
     console.log("Guardado");
-    const {title: title, stock: stock, price: price} = req.body;
-    const Carri = new Carris({id: id,title: title, stock: stock, price: price})
+    const {title: title, stock: stock, price: price, image: image} = req.body;
+    const Carri = new Carris({id: id,title: title, stock: stock, price: price, image: image})
     await Carri.save()
   } catch (err) {
     console.log("error al guardar");
@@ -190,7 +192,7 @@ app.post("/:id/carrito", async (req, res) => {
 
 //---------------------------------------------------------------------------------
 //mostrar pokemon en especifico
-app.get("/:id/edit", async (req, res) => {
+app.get("/:id/edit", isAuthenticated, async (req, res) => {
   const datos = await fs.promises.readFile("productos.js", "utf-8");
   const arrayPokemon = JSON.parse(datos);
   const pokemons = arrayPokemon;
@@ -207,25 +209,33 @@ app.get("/:id/edit", async (req, res) => {
 //---------------------------------------------------------------------------------
 //render subir al producto.js el nuevo pokemon
 app.post("/newProduct", async (req, res) => {
-  const datos = await fs.promises.readFile("productos.js", "utf-8");
-  const arrayPokemon = JSON.parse(datos);
-  const pokemons = arrayPokemon;
-  pokemons.push({
-    ...req.body,
-    price: parseInt(req.body.price),
-    stock: parseInt(req.body.stock),
-    id: parseInt(pokemons.length + 1),
-  });
-  try {
-    fs.promises.writeFile("productos.js", JSON.stringify(pokemons, null, "\t"));
-    const {id: id, title, stock: stock, price: price} = req.body;
-    const Poke = new Pokes({id: id,title: title, stock: stock, price: price})
-    await Poke.save()
-    console.log("Guardado");
-  } catch (err) {
-    console.log("error al guardar");
+  console.log(user);
+  if(user.email == "admin123@hotmail.com"){
+    const datos = await fs.promises.readFile("productos.js", "utf-8");
+    const arrayPokemon = JSON.parse(datos);
+    const pokemons = arrayPokemon;
+    pokemons.push({
+      ...req.body,
+      price: parseInt(req.body.price),
+      stock: parseInt(req.body.stock),
+      id: parseInt(pokemons.length + 1),
+    });
+    try {
+      fs.promises.writeFile("productos.js", JSON.stringify(pokemons, null, "\t"));
+      const {id: id, title, stock: stock, price: price, image: image} = req.body;
+      const Poke = new Pokes({id: id,title: title, stock: stock, price: price, image: image})
+      await Poke.save()
+
+      console.log("Guardado");
+    } catch (err) {
+      console.log("error al guardar");
+    }
+    res.render("index", { pokemons });
+  }else {
+    console.log("Error al ingresar, no tiene permiso de Admin!");
+    res.redirect("/");
   }
-  res.render("index", { pokemons });
+
 });
 
 //---------------------------------------------------------------------------------
@@ -253,8 +263,7 @@ app.put("/:id", async (req, res) => {
       JSON.stringify(editPokemon, null, "\t")
     );
     console.log("Guardado");
-    const {id: id, title, stock: stock, price: price} = req.body;
-    await Pokes.findByIdAndUpdate(id, {id: id, title: title, stock: stock, price: price})
+    await Pokes.findByIdAndUpdate(id)
   } catch (err) {
     console.log("error al guardar");
   }

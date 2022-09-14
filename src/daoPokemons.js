@@ -1,11 +1,12 @@
 const mongoose = require('mongoose')
-const {Schema} = require('mongoose')
+const { Schema } = mongoose;
 
 const noteSchema = new Schema ({
-    id: { type: String, required: true },
-    title: { type: String, required: true },
-    stock: { type: Number, required: true },
-    price: { type: Number, required: true },
-},{timestamps: true})
+    id: String,
+    title: String,
+    stock: Number,
+    price:  Number,
+    image: String
+},)
 
 module.exports = mongoose.model('pokemons', noteSchema);
